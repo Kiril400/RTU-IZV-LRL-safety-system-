@@ -12,5 +12,6 @@ version = cursor.fetchall()
 print("MySQL version:", version)
 cursor.close()
 conn.close()
+#xd
 
 
