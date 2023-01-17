@@ -1,7 +1,7 @@
 import mysql.connector
 
 conn = mysql.connector.connect(
-    host="192.168.238.131",
+    host="", #jaieliek ip no SQL hosta
     user="davisstrazds",
     password="b9xVf4JZ",
     database="lrldb"
@@ -12,6 +12,4 @@ version = cursor.fetchall()
 print("MySQL version:", version)
 cursor.close()
 conn.close()
-#xd
-
-
+#ja izprinte SQL versiju viss strada
