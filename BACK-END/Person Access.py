@@ -1,6 +1,6 @@
 import mysql.connector
 
-id= "'" + input("id:") + "'" #ievada LietotajaID
+LietotajaID = input("id:") #ievada LietotajaID
 
 conn = mysql.connector.connect(
     host="", #SQL host ip
@@ -9,12 +9,9 @@ conn = mysql.connector.connect(
     database="lrldb"
 )
 cursor = conn.cursor()
-query = "SELECT * FROM lrldb.lietotaji WHERE LietotajaID=" + id
-
+query = "SELECT * FROM lrldb.lietotaji WHERE LietotajaID = " + LietotajaID
 cursor.execute(query)
-
 result = cursor.fetchall()
-
 for x in result:
     print(x)     #izprinte cilveka access statusu (0 vai 1)
 
