@@ -1,5 +1,6 @@
 import socket
 import MySQLdb
+import datetime
 
 class databaseInstance():
     def __init__(self):
@@ -11,6 +12,23 @@ class databaseInstance():
     def startConnenction(self):
         self.connection = MySQLdb.connect(self.__host, self.__user, self.__password, self.__database)
     
+    def addUser(self, card_id):
+        thiscursor = self.connection.cursor()
+        thiscursor.execute("SELECT username FROM lab_users_labuser WHERE card_id = %(card_id)s", {'card_id': card_id})
+        querydata = thiscursor.fetchone()
+        if querydata:
+            print("User already exists")
+            return
+        
+        username = input("Enter username: ")
+        year_grad = str(int(input("Enter graduation year: ")))
+        now = datetime.datetime.now()
+        isonow = now.strftime('%Y-%m-%d %H:%M:%S')
+        thiscursor.execute("INSERT INTO lab_users_labuser (card_id, username, year_grad, access_to_lab, last_modified, date_added) VALUES (%s, %s, %s, 1, %s, %s)", (card_id, username, year_grad, isonow, isonow))
+        self.connection.commit()
+        thiscursor.close()
+        return
+
     def checkAccessAndLog(self, card_id):
         thiscursor = self.connection.cursor()
         thiscursor.execute("SELECT username, access_to_lab FROM lab_users_labuser WHERE card_id = %(card_id)s", {'card_id': card_id})
@@ -30,9 +48,9 @@ class databaseInstance():
         self.connection.commit()
         thiscursor.close()
         if event_type == "Access Granted":
-            return True
+            return b'Y'
         else:
-            return False
+            return b'N'
 
     def endConnection(self):
         self.connection.close()
@@ -40,28 +58,20 @@ class databaseInstance():
 database = databaseInstance()
 database.startConnenction()
 
-# bind all IP
 HOST = '10.109.6.206'
-# Listen on Port 
-PORT = 35682 
-#Size of receive buffer   
-BUFFER_SIZE = 1024    
-# Create a TCP/IP socket
+PORT = 35682
+BUFFER_SIZE = 255
+
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-# Bind the socket to the host and port
 s.bind((HOST, PORT))
+
 print("started listening")
 while True:
-    # Receive BUFFER_SIZE bytes data
-    # data is a list with 2 elements
-    # first is data
-    #second is client address
-    data = s.recvfrom(BUFFER_SIZE)
-    if data:
-        #print received data
-        print('Client to Server: ' , data)
-        # Convert to upper case and send back to Client
-        access = database.checkAccessAndLog(data[1])
-        s.sendto(data[0].upper(), access)
-# Close connection
-s.close()
+    data, address = s.recvfrom(BUFFER_SIZE)
+    print(data, address)
+    if address:
+        data = bytes(data).hex()
+        print('Client to Server: ' , data, address)
+        # database.addUser(data)
+        access = database.checkAccessAndLog(data)
+        s.sendto(access, address)
