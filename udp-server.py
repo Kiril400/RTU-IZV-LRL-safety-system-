@@ -7,7 +7,7 @@ class databaseInstance():
         self.__host = "localhost"
         self.__user = "pythonuser"
         self.__password = "pythonpwd123"
-        self.__database = "lab_users"
+        self.__database = "lrl_database"
     
     def startConnenction(self):
         self.connection = MySQLdb.connect(self.__host, self.__user, self.__password, self.__database)
@@ -44,9 +44,11 @@ class databaseInstance():
             print("Unknown card_id:", card_id) # For debug
             event_type = "Unknown, Access Denied"
 
-        thiscursor.execute("INSERT INTO lab_users.lab_users_event (card_id, event_type) VALUES(%(card_id)s, %(event_type)s)", {'card_id': card_id, 'event_type': event_type})
+        thiscursor.execute("INSERT INTO lrl_database.lab_users_event (card_id, event_type) VALUES(%(card_id)s, %(event_type)s)", {'card_id': card_id, 'event_type': event_type})
         self.connection.commit()
         thiscursor.close()
+        if event_type == "Unknown, Access Denied":
+            return b'A'
         if event_type == "Access Granted":
             return b'Y'
         else:
@@ -58,13 +60,14 @@ class databaseInstance():
 database = databaseInstance()
 database.startConnenction()
 
-HOST = '10.109.6.206'
+HOST = '10.109.6.199'
 PORT = 35682
 BUFFER_SIZE = 255
-
+ 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.bind((HOST, PORT))
 
+database.addUser("b973aae2")
 print("started listening")
 while True:
     data, address = s.recvfrom(BUFFER_SIZE)
@@ -72,6 +75,8 @@ while True:
     if address:
         data = bytes(data).hex()
         print('Client to Server: ' , data, address)
-        # database.addUser(data)
         access = database.checkAccessAndLog(data)
-        s.sendto(access, address)
+        if access == b'A':
+            database.addUser(data)
+        else:
+            s.sendto(access, address)

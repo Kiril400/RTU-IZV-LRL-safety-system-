@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-x6h=qb6fxdljvp^bhm7hnn_vezg++kw@-1m3aukse6%!835crf
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['10.109.6.206', 'localhost']
+ALLOWED_HOSTS = ['10.109.6.199', 'localhost']
 
 
 # Application definition
@@ -78,9 +78,9 @@ WSGI_APPLICATION = 'radosa_lab.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'lab_users',
-        'USER': 'root2',
-        'PASSWORD': 'pass',
+        'NAME': 'lrl_database',
+        'USER': 'pythonuser',
+        'PASSWORD': 'pythonpwd123',
         'HOST':'localhost',
         'PORT':'3306',
     }
@@ -111,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Riga'
 
 USE_I18N = True
 
